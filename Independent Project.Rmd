@@ -1,0 +1,359 @@
+---
+title: "Independent Project."
+author: "Simon Mmari"
+date: '2022-03-25'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Define the question
+The question is making conclusion on who is likely to click on the ads or not. 
+
+# Metric for success
+
+In order to work on the above problem, you need to do the following:
+  
+  -   Define the question, the metric for success, the context, experimental design taken and the appropriateness of the available data to answer the given question.
+
+-   Find and deal with outliers, anomalies, and missing data within the dataset.
+
+-   Perform univariate and bivariate analysis.
+
+-   From your insights provide a conclusion and recommendation.
+
+
+# Data Understanding (the context)
+
+A Kenyan entrepreneur has created an online cryptography course and would want to advertise it on her blog. She currently targets audiences originating from various countries. In the past, she ran ads to advertise a related course on the same blog and collected data in the process. She would now like to employ your services as a Data Science Consultant to help her identify which individuals are most likely to click on her ads.
+
+In order to work on the above problem, you need to do the following:
+  
+  -   Define the question, the metric for success, the context, experimental design taken and the appropriateness of the available data to answer the given question.
+
+-   Find and deal with outliers, anomalies, and missing data within the dataset.
+
+-   Perform univariate and bivariate analysis.
+
+-   From your insights provide a conclusion and recommendation.
+
+# Experimental design
+
+1.  Import the data to R
+2.  Perform data exploration
+3.  Define metrics for success
+4.  Perform Univariate and Bivariate data Analysis
+5.  Provide conclusion
+
+# Loading Dataset
+```{r}
+ad <- read.csv("http://bit.ly/IPAdvertisingData")
+```
+
+
+```{r}
+head(ad)
+tail(ad)
+```
+
+# Checking dataset.
+```{r}
+# Finding the Shape of the dataset
+dim(ad)
+```
+
+```{r}
+# Finding the datatypes of the dataset
+str(ad)
+
+```
+# Data cleaning
+
+```{r}
+# checking for missing Data
+colSums(is.na(ad))
+```
+
+```{r}
+# Check for duplicated data in the ad
+ad1 <- ad[duplicated(ad),]
+ad1
+```
+
+# Univariate Analysis.
+
+
+```{r}
+str(ad)
+boxplot(ad$Daily.Time.Spent.on.Site, main = 'Daily Time Spent on-site')
+boxplot(ad$Age, main = 'Age Boxplot')
+boxplot(ad$Area.Income, main = 'Area Income Boxplot')
+boxplot(ad$Daily.Internet.Usage, main = 'Daily Internet usage boxplot')
+```
+## print out the outliers
+```{r}
+boxplot(ad$Area.Income, main = 'Area Income Boxplot')$out
+```
+
+
+```{r}
+ad[['Timestamp']] <- as.POSIXct(ad[['Timestamp']],
+                                   format = "%Y-%m-%d %H:%M:%S")
+```
+
+## Numerical columns.
+
+```{r}
+summary(ad)
+```
+There are outliers that do not look like they are in the extreme. There are areas where poverty is prevelant in such areas the total income could be that small.
+ 
+## Mean.
+```{r}
+mean.age <- mean(ad$Age)
+mean.age
+
+```
+## Function to get the mode.
+```{r}
+getmode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+```
+
+##Area income 
+
+```{r}
+mean.areaincome <- mean(ad$Area.Income)
+mean.areaincome
+
+```
+```{r}
+hist(ad$Area.Income,
+     main="Histogram for Area Income", 
+     xlab="Area income", 
+     border="blue", 
+     col="steelblue",)
+
+```
+#### Daily time spent on site
+
+```{r}
+mean.dtsos <- mean(ad$Daily.Time.Spent.on.Site)
+mean.dtsos
+
+````
+
+#### Clicked.on.Ad
+```{r}
+uniq_clickers <- unique(ad$Clicked.on.Ad,)
+length(uniq_clickers)
+```
+# There are two categories of the people who clicked on ads
+
+Let us plot the frequency of each
+```{r}
+clickers <- ad$Clicked.on.Ad
+clickers_frequency <- table (clickers)
+barplot(clickers_frequency, col = "steelblue")
+```
+# There are 500 people who clicked on ads and another 500 did not click on the ads. 
+
+### Categorical Columns
+####Ad.Topic.line
+
+
+
+# There are 1000 unique topic lines meaning it would be impossible to get a good visualization. 
+
+
+#### Country 
+
+```{r}
+uniq_country <- unique(ad$Country)
+length(uniq_country)
+
+```
+
+
+# There are 237 unique countries. 
+
+````{r}
+library(sf)
+library(raster)
+library(dplyr)
+library
+#library(spDataLarge)
+library(tmap)
+library(leaflet) 
+library(ggplot2)
+
+```
+
+```{r}
+Country <- ad$Country
+countyfreq <- table(Country)
+
+```
+
+
+```{r}
+hist(ad$`Age`, xlab = "Age")
+#An even spread on time spent on site
+
+```
+
+hist(ad$`Male`, xlab = "Male")
+
+````{r}
+age <- ad$Age
+ages <- table(age)
+barplot(ages, xlab = "Male")
+
+#The age distribution
+
+```
+
+```{r}
+hist(ad$Area.Income, col = 7)
+
+```
+
+```{r}
+AGE  <- table(ad$Age)
+AGE
+
+```
+
+```{r}
+barplot(AGE, main = "Simple bar plot", xlab = "Age ", ylab = "Frequency")
+
+```
+
+
+
+## Bivariate Analysis
+
+# Lets find the covariance between a variety of the features 
+```{r}
+
+daily <- ad$`Daily Time Spent on Site`
+age <- ad$Age
+income <- ad$`Area Income`
+sex <-ad$Male
+use <- ad$`Daily Internet Usage`
+
+click <- ad$`Clicked on Ad`
+#cov(daily,click)
+#That has a negative correlation
+
+```
+
+```{r}
+ad2 <- ad$Age
+ad3 <- ad$Area.Income
+cov(ad2, ad3)
+```
+
+```{r}
+cor(ad2, ad3)
+
+```
+
+
+# checking correlation matrix
+
+```{r}
+num_ads <- unlist(lapply(ad, is.numeric))
+num_ad <- ad[ , num_ads]
+cor(num_ad)
+
+```
+
+```{r}
+
+boxplot(ad$Age, main='boxplot', xlab = 'area income', col = 5)
+
+```
+
+```{r}
+plot(ad$Area.Income, col = 3)
+
+```
+
+#### Correlation
+#creating with only interger columns
+```{r}
+
+numerical_df = ad[c("Daily.Time.Spent.on.Site", "Age", "Area.Income","Daily.Internet.Usage" ,"Male", "Clicked.on.Ad" )]
+head(numerical_df)
+
+```
+
+```{r}
+correlation = cor(numerical_df)
+correlation
+
+```
+
+
+# Hierarchical Clustering.
+
+```{r}
+# Loading the data set
+# ---
+#
+data("USArrests")
+```
+
+
+```{r}
+z <- dist(sp1.encod, method = "euclidean")
+
+```
+
+
+```{r}
+# We then hierarchical clustering using the Ward's method
+# ---
+# 
+res.hc <- hclust(z, method = "ward.D2" )
+res.hc
+```
+
+```{r}
+
+# plotting the obtained dendrogram
+# ---
+# 
+plot(res.hc, cex = 0.6, hang = -1)
+
+```
+
+## DBSCAN
+```{r}
+install.packages("dbscan")
+
+```
+```{r}
+# Loading the recquired package.
+library("dbscan")
+
+```
+
+```{r}
+np<-dbscan(sp1.encod,eps=0.4,MinPts = 4)
+np
+```
+
+```{r}
+# Plotting our clusters as shown
+
+hullplot(sp1.encod,np$cluster)
+
+```
